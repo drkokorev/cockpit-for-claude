@@ -8,4 +8,4 @@ Works in the Claude Code terminal and the Claude desktop app (Code tab). Require
 - `/cockpit-demo` fills it with sample data (`/cockpit-demo off` restores yours)
 - `/cockpit-report`, `/cockpit-export`, `/cockpit-budget`, `/cockpit-guard`, `/cockpit-cache`
 
-Full documentation, screenshots and the changelog: https://github.com/drkokorev/claude-cockpit
+Full documentation, screenshots and the changelog: https://github.com/drkokorev/cockpit-for-claude

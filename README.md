@@ -17,14 +17,14 @@ Cockpit is a [Claude Code mod](https://code.claude.com/docs/en/plugins/mods/over
 In Claude Code:
 
 ```
-/plugin marketplace add drkokorev/claude-cockpit
+/plugin marketplace add drkokorev/cockpit-for-claude
 /plugin install cockpit@claude-cockpit
 ```
 
 Or from your shell:
 
 ```bash
-claude plugin marketplace add drkokorev/claude-cockpit
+claude plugin marketplace add drkokorev/cockpit-for-claude
 claude plugin install cockpit@claude-cockpit
 ```
 
@@ -128,8 +128,8 @@ Cockpit runs inside your Claude Code process and makes no network requests. It r
 ## Develop
 
 ```bash
-git clone https://github.com/drkokorev/claude-cockpit
-cd claude-cockpit
+git clone https://github.com/drkokorev/cockpit-for-claude
+cd cockpit-for-claude
 claude plugin validate plugins/cockpit
 claude plugin test plugins/cockpit
 claude --plugin-dir plugins/cockpit
