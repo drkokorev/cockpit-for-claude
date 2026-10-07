@@ -4,6 +4,8 @@
 
 Cockpit is a [Claude Code mod](https://code.claude.com/docs/en/plugins/mods/overview): a panel beside the transcript with context fill, rate limits, cost, subagents, tool calls, changed files and test runs. Every section opens to the details. A guard asks you before `rm -rf`, a force push or an edit to `.env`.
 
+**Works in** the Claude Code terminal and the **Claude desktop app** (Code tab). Tested on macOS.
+
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 ![Claude Code 2.1.287+](https://img.shields.io/badge/Claude%20Code-2.1.287%2B-d97757)
 ![Mod](https://img.shields.io/badge/type-mod-blue)
@@ -120,7 +122,7 @@ Cockpit runs inside your Claude Code process and makes no network requests. It r
 ## Requirements
 
 - Claude Code **v2.1.287 or later** (mods are on by default). Check with `claude --version`.
-- The panel and band draw in the terminal and in the desktop app's Code tab. In the VS Code chat panel, `claude -p` and cloud sessions, the guard and alerts still run; nothing is drawn.
+- The panel and band draw in the terminal (any size; the side panel docks from 110 columns in fullscreen) and in the Claude desktop app's Code tab. The regular chat tab of the desktop app does not load mods. In the VS Code chat panel, `claude -p` and cloud sessions, the guard and alerts still run; nothing is drawn.
 - Rate-limit windows appear on a Pro or Max subscription. With an API key, Cockpit shows cost and budget instead.
 
 ## Develop
