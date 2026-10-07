@@ -1,0 +1,10 @@
+# types the engine and /plugin-types generate
+.claude/
+.claude-plugin/types/
+plugins/*/.claude/
+plugins/*/.claude-plugin/types/
+# capture output for screenshots
+media/screens.jsonl
+.cockpit/
+.DS_Store
+node_modules/

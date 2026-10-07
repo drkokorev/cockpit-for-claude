@@ -1,0 +1,12 @@
+{
+  "name": "claude-cockpit",
+  "description": "Cockpit: a live instrument panel for Claude Code sessions",
+  "owner": { "name": "drkokorev" },
+  "plugins": [
+    {
+      "name": "cockpit",
+      "source": "./plugins/cockpit",
+      "description": "Live context, limits, cost, agents, tools, files and tests, plus a guard for risky commands"
+    }
+  ]
+}
