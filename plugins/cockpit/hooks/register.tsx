@@ -465,12 +465,11 @@ const buildMarkdown = (s: CockpitStats, now: number) => {
 const exportReport = async ($: Dollar) => {
   const s = await read($, stats)
   const now = await $.clock.now()
-  const stamp = new Date(now).toISOString().slice(0, 16).replace(/[:T]/g, '-')
   const root = s.cwd || (await $.session.cwd())
-  const path = `${root}/.cockpit/report-${stamp}.md`
   try {
-    await $.fs.write(path, buildMarkdown(s, now))
-    return `Cockpit report saved to ${path}`
+    // one fixed file, relative to the session's working directory; each export replaces it
+    await $.fs.write('.cockpit/cockpit-report.md', buildMarkdown(s, now))
+    return `Cockpit report saved to ${root}/.cockpit/cockpit-report.md`
   } catch (error) {
     return `Cockpit could not save the report: ${String(error)}`
   }
@@ -1218,6 +1217,10 @@ const cacheLeftMs = (s: CockpitStats, p: CockpitPrefs, now: number) =>
 const loadFileView = async ($: Dollar, path: string, isNew: boolean) => {
   const now = await $.clock.now()
   let lines: string[] = []
+  if (SECRET_FILE.test(path)) {
+    await update($, stats, s => ({ ...s, fileView: { path, lines: ['(secrets file: contents not read)'], at: now } }))
+    return
+  }
   try {
     const top = await $.process.run(['git', 'rev-parse', '--show-toplevel'], { timeoutMs: 5000 })
     const root = top.exitCode === 0 ? top.stdout.trim() : undefined

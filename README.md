@@ -107,7 +107,7 @@ The guard is a seatbelt, not a sandbox: it matches command text, so treat it as 
 | --- | --- |
 | `/cockpit` | Open the panel (or print a report where no panel can be shown) |
 | `/cockpit-report` | Print a session summary in the transcript |
-| `/cockpit-export` | Save a Markdown report with every turn and tool to `.cockpit/report-<date>.md` |
+| `/cockpit-export` | Save a Markdown report with every turn and tool to `.cockpit/cockpit-report.md` |
 | `/cockpit-budget 5` · `on` · `off` · `auto` | Set a spend budget in USD, or choose when it shows (`auto`: with API billing, not on a subscription) |
 | `/cockpit-guard on` · `off` | Turn the guard on or off |
 | `/cockpit-cache 5` · `60` | The prompt-cache lifetime the countdown assumes, in minutes |

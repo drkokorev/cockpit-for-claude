@@ -10,6 +10,6 @@ test('export answers with a saved path', async ($, on) => {
   })
   on('session.cwd', () => ({ value: '/repo' }))
   const out = await $.command.run({ command: 'cockpit-export', args: '' } as Parameters<typeof $.command.run>[0])
-  expect(out.text).toContain('report-')
+  expect(out.text).toContain('.cockpit/cockpit-report.md')
   expect(written.length).toBe(1)
 })

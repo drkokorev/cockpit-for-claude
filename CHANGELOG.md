@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 (2026-10-07)
+
+- Never reads or diffs secrets files (`.env*`, keys, credentials); shows "contents not read" instead
+- `/cockpit-export` writes one fixed file, `.cockpit/cockpit-report.md`
+- Plugin icon
+- README lists exactly what the mod runs, reads, writes and hooks
+
 ## 1.0.0 (2026-10-07)
 
 First public release.

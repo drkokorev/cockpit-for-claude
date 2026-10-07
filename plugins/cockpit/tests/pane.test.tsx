@@ -117,11 +117,16 @@ test('a changed file opens to its diff', async ($, on) => {
   const out = (exitCode: number, stdout: string) => ({ value: { exitCode, stdout, stderr: '', isStdoutTruncated: false, isStderrTruncated: false } })
   on('process.run', (_, e) => {
     const args = e.argv.join(' ')
-    if (args.startsWith('git diff --numstat')) return out(0, '3\t1\tsrc/app.ts\n')
+    if (args.startsWith('git diff --numstat')) return out(0, '3\t1\tsrc/app.ts\n1\t0\tconfig/.env.production\n')
     if (args.startsWith('git ls-files')) return out(0, '')
     if (args.startsWith('git rev-parse')) return out(0, '/repo\n')
     if (args.startsWith('git diff --unified')) return out(0, '@@ -1,2 +1,4 @@\n-old line\n+new line\n context\n')
     return out(1, '')
+  })
+  let readSecret = false
+  on('fs.read', () => {
+    readSecret = true
+    return { value: '' }
   })
   on('tool.call', { tool: 'Edit' }, () => ({ result: {} }))
   await $.tool.call({ tool: 'Edit', file_path: '/repo/src/app.ts', old_string: 'a', new_string: 'b' })
@@ -132,6 +137,9 @@ test('a changed file opens to its diff', async ($, on) => {
   expect(await ui.find({ type: 'Text', text: /-old line/ })).toBeDefined()
   await ui.press({ key: 'file-src/app.ts' })
   expect(await ui.find({ type: 'Text', text: /\+new line/ })).toBeUndefined()
+  await ui.press({ key: 'file-config/.env.production' })
+  expect(await ui.find({ type: 'Text', text: /contents not read/ })).toBeDefined()
+  expect(readSecret).toBe(false)
   await ui.unmount()
 })
 
