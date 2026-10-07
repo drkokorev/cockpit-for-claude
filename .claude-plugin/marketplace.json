@@ -1,5 +1,5 @@
 {
-  "name": "claude-cockpit",
+  "name": "cockpit-for-claude",
   "description": "Cockpit: a live instrument panel for Claude Code sessions",
   "owner": { "name": "drkokorev" },
   "plugins": [

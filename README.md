@@ -18,14 +18,14 @@ In Claude Code:
 
 ```
 /plugin marketplace add drkokorev/cockpit-for-claude
-/plugin install cockpit@claude-cockpit
+/plugin install cockpit@cockpit-for-claude
 ```
 
 Or from your shell:
 
 ```bash
 claude plugin marketplace add drkokorev/cockpit-for-claude
-claude plugin install cockpit@claude-cockpit
+claude plugin install cockpit@cockpit-for-claude
 ```
 
 The panel opens on its own in a wide terminal; anywhere else, type `/cockpit`. To see every section filled in before a long session, run `/cockpit-demo` (and `/cockpit-demo off` to get your own numbers back).
