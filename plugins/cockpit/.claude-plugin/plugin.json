@@ -1,11 +1,10 @@
 {
   "name": "cockpit",
-  "version": "1.0.1",
-  "description": "A live instrument panel for Claude Code: context, limits, cost, agents, tools, files, tests, and a guard for risky commands",
-  "author": { "name": "drkokorev" },
-  "homepage": "https://github.com/drkokorev/cockpit-for-claude",
-  "repository": "https://github.com/drkokorev/cockpit-for-claude",
+  "version": "1.0.2",
+  "description": "Agent cockpit for Claude Code: live context, limits, cost, tools, files, tests and a guard for risky commands",
+  "author": {
+    "name": "drkokorev"
+  },
   "license": "MIT",
-  "keywords": ["mod", "dashboard", "context", "tokens", "cost", "rate-limits", "subagents", "guard", "observability"],
   "types": "./types/index.d.ts"
 }

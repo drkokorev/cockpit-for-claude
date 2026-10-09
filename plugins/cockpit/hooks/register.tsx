@@ -9,6 +9,7 @@ import type { CockpitAgent, CockpitCall, CockpitDiffFile, CockpitPane, CockpitPr
 
 const PANE = 'cockpit'
 const STORE_LIFETIME = 'lifetime'
+const STORE_PLAN = 'plan'
 
 const EMPTY_STATS: CockpitStats = {
   startedAt: 0,
@@ -127,8 +128,16 @@ const signatureOf = (tool: string, args: Record<string, unknown>) => {
   return `${tool}:${typeof key === 'string' ? key.slice(0, 200) : ''}`
 }
 
-// A subscription reports rate-limit windows; API-key billing does not.
-const isSubscription = (s: CockpitStats) => s.limits.length > 0
+// A subscription reports rate-limit windows; API-key billing does not. The
+// windows arrive with the first reply, so a plan seen once is remembered.
+const isSubscription = (s: CockpitStats) => s.limits.length > 0 || s.isPlan === true
+
+// On a subscription the dollars are only what the API would charge: the
+// budget and the dollars in the status line and band stay out of the way
+// unless the budget is turned on.
+const isBudgetControlShown = (p: CockpitPrefs, s: CockpitStats) => !isSubscription(s) || p.budgetMode === 'on' || p.budgetUsd > 0
+
+const isMoneyInLine = (p: CockpitPrefs, s: CockpitStats) => !p.isCostHidden && (!isSubscription(s) || p.budgetMode === 'on')
 
 const isBudgetVisible = (p: CockpitPrefs, s: CockpitStats) =>
   !p.isCostHidden && p.budgetUsd > 0 && (p.budgetMode === 'on' || (p.budgetMode === 'auto' && !isSubscription(s)))
@@ -218,7 +227,7 @@ const pushStatus = async ($: Dollar) => {
   const parts = [`ctx ${s.ctxPercent === undefined ? '—' : `${s.ctxPercent}%`}`]
   const fiveHour = s.limits.find(l => l.kind === 'five_hour')
   if (fiveHour) parts.push(`5h ${Math.round(fiveHour.percentUsed)}%`)
-  if (!p.isCostHidden) parts.push(isBudgetVisible(p, s) ? `${fmtUsd(s.costUsd)}/${fmtUsd(p.budgetUsd)}` : fmtUsd(s.costUsd))
+  if (isMoneyInLine(p, s)) parts.push(isBudgetVisible(p, s) ? `${fmtUsd(s.costUsd)}/${fmtUsd(p.budgetUsd)}` : fmtUsd(s.costUsd))
   const running = visibleAgents(s).filter(a => a.status === 'running').length
   if (running) parts.push(`${running} agent${running > 1 ? 's' : ''}`)
   parts.push(`${s.toolTotal} tools`)
@@ -259,7 +268,12 @@ const applyUsage = async (
     ctxPercent: usage.context.percent,
     limits: usage.rateLimits.map(l => ({ kind: l.kind, percentUsed: l.percentUsed, resetsAt: l.resetsAt })),
     costUsd: usage.cost?.usd ?? s.costUsd,
+    isPlan: s.isPlan || usage.rateLimits.length > 0,
   }))
+  if (usage.rateLimits.length > 0 && !isPlanStored) {
+    isPlanStored = true
+    await $.store.set(STORE_PLAN, true)
+  }
   const now = await $.clock.now()
   await update($, stats, s => {
     const limitStart = { ...(s.limitStart ?? {}) }
@@ -663,15 +677,17 @@ const drawCockpit = async ($: Dollar, els: CockpitElements, bodyColumns: number)
           await pushStatus($)
         }}
       />
-      <Button
-        key="budget"
-        hotkey="b"
-        label={`Budget: ${p.budgetMode}${p.budgetUsd > 0 ? ` ${fmtUsd(p.budgetUsd)}` : ''}`}
-        onPress={async () => {
-          await update($, prefs, cur => ({ ...cur, budgetMode: (cur.budgetMode === 'auto' ? 'on' : cur.budgetMode === 'on' ? 'off' : 'auto') as CockpitPrefs['budgetMode'] }))
-          await pushStatus($)
-        }}
-      />
+      {isBudgetControlShown(p, s) ? (
+        <Button
+          key="budget"
+          hotkey="b"
+          label={`Budget: ${p.budgetMode}${p.budgetUsd > 0 ? ` ${fmtUsd(p.budgetUsd)}` : ''}`}
+          onPress={async () => {
+            await update($, prefs, cur => ({ ...cur, budgetMode: (cur.budgetMode === 'auto' ? 'on' : cur.budgetMode === 'on' ? 'off' : 'auto') as CockpitPrefs['budgetMode'] }))
+            await pushStatus($)
+          }}
+        />
+      ) : null}
       <Button
         key="report"
         hotkey="p"
@@ -969,7 +985,7 @@ const drawCockpit = async ($: Dollar, els: CockpitElements, bodyColumns: number)
           { text: `${pad(fmtDur(t.durationMs), 7)}${pad(`${fmtTokens(t.tokensIn)} in`, 10)}cache ${t.tokensIn ? Math.round((t.cacheRead / t.tokensIn) * 100) : 0}%`, dim: true },
         ),
       ),
-    line({
+    !isBudgetControlShown(p, s) ? line({ text: 'budget: hidden on a subscription · /cockpit-budget on shows it', dim: true }) : line({
       text: `budget: ${p.budgetMode}${p.budgetUsd > 0 ? ` · ${fmtUsd(p.budgetUsd)}` : ' · not set'}${isSubscription(s) ? ' · subscription detected' : ' · API billing'}`,
       dim: true,
     }),
@@ -1388,6 +1404,7 @@ const demoStats = (cur: CockpitStats, now: number): CockpitStats => {
 // ---------- the module ----------
 
 let isInteractive = true
+let isPlanStored = false
 let ticker: Timer | undefined
 let idleTicker: Timer | undefined
 
@@ -1435,6 +1452,9 @@ export const register: Register = on => {
     // fill in fields added by newer versions of the mod
     await update($, stats, s => ({ ...EMPTY_STATS, ...s }))
     await update($, prefs, p => ({ ...DEFAULT_PREFS, ...p }))
+
+    isPlanStored = (await $.store.get(STORE_PLAN)) === true
+    if (isPlanStored) await update($, stats, s => ({ ...s, isPlan: true }))
 
     const current = await read($, stats)
     if (current.startedAt === 0) {
@@ -1869,7 +1889,7 @@ export const register: Register = on => {
           {pct === undefined ? <Text dimColor>—</Text> : <Text color={levelColor(pct)}>{bar(pct, width)} {pct}%</Text>}
           {fiveHour ? <Text color={levelColor(fiveHour.percentUsed)}>5h {Math.round(fiveHour.percentUsed)}%</Text> : null}
           {sevenDay ? <Text color={levelColor(sevenDay.percentUsed)}>7d {Math.round(sevenDay.percentUsed)}%</Text> : null}
-          {p.isCostHidden ? null : <Text bold>{isBudgetVisible(p, s) ? `${fmtUsd(s.costUsd)}/${fmtUsd(p.budgetUsd)}` : fmtUsd(s.costUsd)}</Text>}
+          {!isMoneyInLine(p, s) ? null : <Text bold>{isBudgetVisible(p, s) ? `${fmtUsd(s.costUsd)}/${fmtUsd(p.budgetUsd)}` : fmtUsd(s.costUsd)}</Text>}
           {s.loopAlerts ? <Text color="yellow">{`⟳ ${s.loopAlerts}`}</Text> : null}
           {visibleAgents(s).some(a => a.status === 'running') ? <Text color="magenta">{`${visibleAgents(s).filter(a => a.status === 'running').length} agent${visibleAgents(s).filter(a => a.status === 'running').length > 1 ? 's' : ''}`}</Text> : null}
           <Text dimColor>{`${s.toolTotal} tools${s.toolErrors ? `, ${s.toolErrors} err` : ''}`}</Text>

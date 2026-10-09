@@ -60,6 +60,8 @@ export type CockpitStats = {
   ctxWindow: number
   ctxPercent?: number
   limits: CockpitLimit[]
+  /** a subscription was seen (now or in an earlier session) */
+  isPlan?: boolean
   costUsd: number
   turnActive: boolean
   turnStartedAt: number

@@ -161,3 +161,23 @@ test('demo data opens an agent card with its timeline and result', async ($, on)
     await ui.unmount()
   }
 })
+
+test('on a subscription the budget control and the dollars in the status line stay hidden', async ($, on) => {
+  mock.clock(on, { now: 1_800_000_000_000 })
+  mock.store(on)
+  const statuses: (string | undefined)[] = []
+  on('ui.status', (_, e) => {
+    statuses.push(e.text)
+    return { value: undefined }
+  })
+  on('ui.toast', () => ({ value: undefined }))
+  await $.command.run({ command: 'cockpit-demo', args: '' } as Parameters<typeof $.command.run>[0])
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect(await ui.find({ type: 'Button', text: /Budget/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /API value/ })).toBeDefined()
+  const last = statuses.filter(Boolean).at(-1) ?? ''
+  expect(last).toContain('5h')
+  expect(last).not.toContain('$')
+  await $.command.run({ command: 'cockpit-budget', args: 'on' } as Parameters<typeof $.command.run>[0])
+  expect(await ui.find({ type: 'Button', text: /Budget: on/ })).toBeDefined()
+})

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2 (2026-10-09)
+
+- On a Pro or Max subscription the budget button and the dollars in the status line and band are hidden: the Cost section shows the API value, labelled as covered by your plan. `/cockpit-budget on` brings the budget back
+- A subscription is remembered between sessions, so a new session no longer looks like API billing until the first reply
+
 ## 1.0.1 (2026-10-07)
 
 - Never reads or diffs secrets files (`.env*`, keys, credentials); shows "contents not read" instead

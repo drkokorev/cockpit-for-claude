@@ -51,7 +51,7 @@ A long agent session is a black box: you find out the context was full when Clau
 | **History** | Sparkline of input tokens per turn | A table of the last ten turns |
 | **All-time** | Sessions, turns, tool calls, spend | Averages per session and per turn |
 
-Where the app shows no side panel, a two-line band above the prompt carries the same live numbers, and a status line under the prompt reads like `◆ ctx 72% · 5h 31% · $1.24 · 14 tools`.
+Where the app shows no side panel, a two-line band above the prompt carries the same live numbers, and a status line under the prompt reads like `◆ ctx 72% · 5h 31% · 14 tools` (with API billing it also shows the session cost, `$1.24`).
 
 <details>
 <summary><b>Screenshots</b></summary>
@@ -123,7 +123,7 @@ Cockpit runs inside your Claude Code process and makes no network requests. It r
 
 - Claude Code **v2.1.287 or later** (mods are on by default). Check with `claude --version`.
 - The panel and band draw in the terminal (any size; the side panel docks from 110 columns in fullscreen) and in the Claude desktop app's Code tab. The regular chat tab of the desktop app does not load mods. In the VS Code chat panel, `claude -p` and cloud sessions, the guard and alerts still run; nothing is drawn.
-- Rate-limit windows appear on a Pro or Max subscription. With an API key, Cockpit shows cost and budget instead.
+- Rate-limit windows appear on a Pro or Max subscription; there the Cost section shows what the session would cost on the API, and the budget stays hidden unless you run `/cockpit-budget on`. With an API key, Cockpit shows the cost and budget everywhere.
 
 ## Develop
 
