@@ -137,6 +137,10 @@ claude --plugin-dir plugins/cockpit
 
 The mod is one hooks module, `plugins/cockpit/hooks/register.tsx`, with its state contract in `plugins/cockpit/types/index.d.ts`. Run `/plugin-types` in a session to get the engine's type declarations for your editor. Issues and pull requests are welcome.
 
+## See also
+
+[Context Diet](https://github.com/drkokorev/context-diet): when Cockpit's Context section shows tool outputs eating the window, Context Diet trims them before they get there. Logs, test runs, JSON and diffs become short digests with the errors and the summary, and the full text stays one Read away.
+
 ## Roadmap
 
 - Spend and turns per day for the last week
